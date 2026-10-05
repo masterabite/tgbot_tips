@@ -19,6 +19,7 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
+from telegram.request import HTTPXRequest  # ← добавьте эту строку
 
 from cycle_calendar import (
     ensure_period_history,
@@ -626,7 +627,22 @@ def main() -> None:
             "Токен бота не найден. Создай файл .env на основе .env.example и укажи TELEGRAM_BOT_TOKEN."
         )
 
-    application = ApplicationBuilder().token(TOKEN).build()
+    # Прокси v2rayA: socks5h — DNS через прокси
+    proxy_url = os.getenv("PROXY_URL", "socks5h://127.0.0.1:20170")
+
+    request = HTTPXRequest(
+        proxy_url=proxy_url,
+        connect_timeout=30.0,
+        read_timeout=30.0,
+    )
+
+    application = (
+        ApplicationBuilder()
+        .token(TOKEN)
+        .request(request)
+        .get_updates_request(request)   # важно: тот же прокси для polling
+        .build()
+    )
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
