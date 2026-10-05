@@ -631,7 +631,7 @@ def main() -> None:
     proxy_url = os.getenv("PROXY_URL", "socks5h://127.0.0.1:20170")
 
     request = HTTPXRequest(
-        proxy_url=proxy_url,
+        proxy=proxy_url,       # ← ИСПРАВЛЕНО: новый параметр
         connect_timeout=30.0,
         read_timeout=30.0,
     )
